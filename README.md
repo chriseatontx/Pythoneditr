@@ -32,10 +32,15 @@ A simple, lightweight text editor built with Python and tkinter, featuring a sta
    cd python-text-editor
    ```
 
-2. Make sure you have the tkinter library installed:
-  ```bash
-  sudo apt install python3-tk
-  ```
+2. Make sure you have the tkinter library installed (Linux):
+   ```bash
+   sudo apt install python3-tk
+   ```
+
+2. Make sure you have the tkinter library installed (Windows):
+   ```bash
+   python -m pip install requests
+   ```
 
 3. Run the text editor:
    ```bash
