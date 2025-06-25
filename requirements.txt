@@ -1,0 +1,17 @@
+# Python Text Editor Requirements
+# This project uses only built-in Python libraries
+
+# Main GUI framework (included with Python)
+# tkinter - Built-in GUI toolkit
+
+# Additional development dependencies (optional)
+# For code formatting and linting during development:
+# black>=22.0.0
+# flake8>=4.0.0
+# pylint>=2.12.0
+
+# For building standalone executables (optional):
+# pyinstaller>=4.8
+
+# Note: This project is designed to work with standard Python installations
+# No additional packages are required for basic functionality
