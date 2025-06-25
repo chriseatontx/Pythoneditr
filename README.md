@@ -93,7 +93,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Author
 
-Created with Python and tkinter for a simple, cross-platform text editing experience.
+Created by Chris Eaton with the assistance of Warp Terminal with Python and tkinter for a simple, cross-platform text editing experience.
 
 ## Acknowledgments
 
