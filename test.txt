@@ -1,5 +1,0 @@
-Simple text editor
-
-files and stuff 
-
-this is text. 
