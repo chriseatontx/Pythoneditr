@@ -13,6 +13,7 @@ A simple, lightweight text editor built with Python and tkinter, featuring a sta
   - Toolbar with quick access buttons
   - Status bar showing file status and cursor position
   - Scrollable text area
+  - Alt menu navigation
 
 ## Screenshots
 
