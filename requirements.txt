@@ -14,4 +14,4 @@
 # pyinstaller>=4.8
 
 # Note: This project is designed to work with standard Python installations
-# No additional packages are required for basic functionality
+# tkinter library required to run.

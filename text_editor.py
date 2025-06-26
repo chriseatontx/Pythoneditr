@@ -19,6 +19,10 @@ class SimpleTextEditor:
         self.current_file = None
         self.is_modified = False
         
+        # Menu navigation state
+        self.active_menu = None
+        self.menu_items = {}
+        
         # Create the main interface
         self.create_menu()
         self.create_toolbar()
@@ -38,42 +42,81 @@ class SimpleTextEditor:
         
         # File menu
         file_menu = tk.Menu(self.menubar, tearoff=0)
-        self.menubar.add_cascade(label="File", menu=file_menu)
-        file_menu.add_command(label="New", command=self.new_file, accelerator="Ctrl+N")
-        file_menu.add_command(label="Open...", command=self.open_file, accelerator="Ctrl+O")
-        file_menu.add_command(label="Save", command=self.save_file, accelerator="Ctrl+S")
-        file_menu.add_command(label="Save As...", command=self.save_file_as, accelerator="Ctrl+Shift+S")
+        self.menubar.add_cascade(label="File", menu=file_menu, underline=0)
+        file_menu.add_command(label="New", command=self.new_file, accelerator="Ctrl+N", underline=0)
+        file_menu.add_command(label="Open...", command=self.open_file, accelerator="Ctrl+O", underline=0)
+        file_menu.add_command(label="Save", command=self.save_file, accelerator="Ctrl+S", underline=0)
+        file_menu.add_command(label="Save As...", command=self.save_file_as, accelerator="Ctrl+Shift+S", underline=5)
         file_menu.add_separator()
-        file_menu.add_command(label="Exit", command=self.exit_app, accelerator="Alt+F4")
+        file_menu.add_command(label="Exit", command=self.exit_app, accelerator="Alt+F4", underline=1)
         
         # Edit menu
         edit_menu = tk.Menu(self.menubar, tearoff=0)
-        self.menubar.add_cascade(label="Edit", menu=edit_menu)
-        edit_menu.add_command(label="Undo", command=self.undo, accelerator="Ctrl+Z")
-        edit_menu.add_command(label="Redo", command=self.redo, accelerator="Ctrl+Y")
+        self.menubar.add_cascade(label="Edit", menu=edit_menu, underline=0)
+        edit_menu.add_command(label="Undo", command=self.undo, accelerator="Ctrl+Z", underline=0)
+        edit_menu.add_command(label="Redo", command=self.redo, accelerator="Ctrl+Y", underline=0)
         edit_menu.add_separator()
-        edit_menu.add_command(label="Cut", command=self.cut, accelerator="Ctrl+X")
-        edit_menu.add_command(label="Copy", command=self.copy, accelerator="Ctrl+C")
-        edit_menu.add_command(label="Paste", command=self.paste, accelerator="Ctrl+V")
+        edit_menu.add_command(label="Cut", command=self.cut, accelerator="Ctrl+X", underline=2)
+        edit_menu.add_command(label="Copy", command=self.copy, accelerator="Ctrl+C", underline=0)
+        edit_menu.add_command(label="Paste", command=self.paste, accelerator="Ctrl+V", underline=0)
         edit_menu.add_separator()
-        edit_menu.add_command(label="Select All", command=self.select_all, accelerator="Ctrl+A")
-        edit_menu.add_command(label="Find...", command=self.find, accelerator="Ctrl+F")
+        edit_menu.add_command(label="Select All", command=self.select_all, accelerator="Ctrl+A", underline=7)
+        edit_menu.add_command(label="Find...", command=self.find, accelerator="Ctrl+F", underline=0)
         
         # Format menu
         format_menu = tk.Menu(self.menubar, tearoff=0)
-        self.menubar.add_cascade(label="Format", menu=format_menu)
-        format_menu.add_command(label="Font...", command=self.choose_font)
-        format_menu.add_command(label="Word Wrap", command=self.toggle_word_wrap)
+        self.menubar.add_cascade(label="Format", menu=format_menu, underline=0)
+        format_menu.add_command(label="Font...", command=self.choose_font, underline=0)
+        format_menu.add_command(label="Word Wrap", command=self.toggle_word_wrap, underline=0)
         
         # View menu
         view_menu = tk.Menu(self.menubar, tearoff=0)
-        self.menubar.add_cascade(label="View", menu=view_menu)
-        view_menu.add_command(label="Status Bar", command=self.toggle_status_bar)
+        self.menubar.add_cascade(label="View", menu=view_menu, underline=0)
+        view_menu.add_command(label="Status Bar", command=self.toggle_status_bar, underline=0)
         
         # Help menu
         help_menu = tk.Menu(self.menubar, tearoff=0)
-        self.menubar.add_cascade(label="Help", menu=help_menu)
-        help_menu.add_command(label="About", command=self.show_about)
+        self.menubar.add_cascade(label="Help", menu=help_menu, underline=0)
+        help_menu.add_command(label="About", command=self.show_about, underline=0)
+        
+        # Store menu references and item mappings for Alt navigation
+        self.menus = {
+            'f': ('File', file_menu),
+            'e': ('Edit', edit_menu), 
+            'o': ('Format', format_menu),  # Using 'o' for Format to avoid conflict with File 'f'
+            'v': ('View', view_menu),
+            'h': ('Help', help_menu)
+        }
+        
+        # Store menu item mappings for each menu
+        self.menu_items = {
+            'File': {
+                'n': ('New', self.new_file),
+                'o': ('Open...', self.open_file),
+                's': ('Save', self.save_file),
+                'a': ('Save As...', self.save_file_as),
+                'x': ('Exit', self.exit_app)
+            },
+            'Edit': {
+                'u': ('Undo', self.undo),
+                'r': ('Redo', self.redo),
+                't': ('Cut', self.cut),
+                'c': ('Copy', self.copy),
+                'p': ('Paste', self.paste),
+                'l': ('Select All', self.select_all),
+                'f': ('Find...', self.find)
+            },
+            'Format': {
+                'f': ('Font...', self.choose_font),
+                'w': ('Word Wrap', self.toggle_word_wrap)
+            },
+            'View': {
+                's': ('Status Bar', self.toggle_status_bar)
+            },
+            'Help': {
+                'a': ('About', self.show_about)
+            }
+        }
     
     def create_toolbar(self):
         """Create the toolbar"""
@@ -159,6 +202,16 @@ class SimpleTextEditor:
         
         # Window close event
         self.root.protocol("WM_DELETE_WINDOW", self.exit_app)
+        
+        # Alt key navigation for menus
+        self.root.bind('<Alt-f>', lambda e: self.activate_menu('f'))
+        self.root.bind('<Alt-e>', lambda e: self.activate_menu('e'))
+        self.root.bind('<Alt-o>', lambda e: self.activate_menu('o'))  # Format menu
+        self.root.bind('<Alt-v>', lambda e: self.activate_menu('v'))
+        self.root.bind('<Alt-h>', lambda e: self.activate_menu('h'))
+        
+        # General key handler for menu item selection
+        self.root.bind('<KeyPress>', self.handle_key_press)
     
     def new_file(self):
         """Create a new file"""
@@ -424,6 +477,51 @@ class SimpleTextEditor:
         """Exit the application"""
         if self.check_unsaved():
             self.root.destroy()
+    
+    def activate_menu(self, menu_key):
+        """Activate a menu using Alt key"""
+        if menu_key in self.menus:
+            menu_name, menu_obj = self.menus[menu_key]
+            self.active_menu = menu_name
+            # Post the menu at the menu bar location
+            try:
+                menu_obj.post(self.root.winfo_rootx() + 10, self.root.winfo_rooty() + 30)
+                self.status_label.config(text=f"{menu_name} menu activated - Press letter key to select item")
+            except Exception:
+                # Fallback: just set the active menu
+                self.status_label.config(text=f"{menu_name} menu selected - Press letter key to select item")
+    
+    def handle_key_press(self, event):
+        """Handle key press events for menu navigation"""
+        # Only handle single letter keys when a menu is active
+        if self.active_menu and len(event.char) == 1 and event.char.isalpha():
+            key = event.char.lower()
+            
+            if self.active_menu in self.menu_items:
+                menu_items = self.menu_items[self.active_menu]
+                
+                if key in menu_items:
+                    item_name, command = menu_items[key]
+                    self.active_menu = None  # Clear active menu
+                    self.status_label.config(text=f"Executed: {item_name}")
+                    
+                    # Execute the command
+                    try:
+                        command()
+                    except Exception as e:
+                        self.status_label.config(text=f"Error executing {item_name}: {str(e)}")
+                    
+                    return 'break'  # Prevent the key from being processed further
+                else:
+                    # Invalid key for current menu
+                    available_keys = ', '.join(menu_items.keys()).upper()
+                    self.status_label.config(text=f"Invalid key. Available keys for {self.active_menu}: {available_keys}")
+        
+        # Clear active menu on Escape key
+        elif event.keysym == 'Escape' and self.active_menu:
+            self.active_menu = None
+            self.status_label.config(text="Menu navigation cancelled")
+            return 'break'
 
 def main():
     root = tk.Tk()
